@@ -1,8 +1,8 @@
-function [fe,me,ke] = weakform(el,xe,de,ae,pe,~)
+function [fe,me,ke] = weakform(el,xe,de,deOld,ae,pe,peOld,~)
 
-global convectionLoad MAT fluxLoad STATE
+global convectionLoad MAT fluxLoad STATE TS
 
-% dt = TS{1};
+dt = TS{1};
 % alpha = TS{3};
 
 % 1 point formula - degree of precision 1
@@ -21,6 +21,7 @@ prop = MAT(1,:);
 
 ke = zeros(3,3);
 me = zeros(3,3);
+fe = zeros(3,1);
 for i = 1:length(w)
     % stress-strain displacement matrix
     B = zeros(2,3);
@@ -28,8 +29,13 @@ for i = 1:length(w)
     [N,dN,jac] = shape(gp(i,:),xe);
     % compute temperature
     T = N * de;
+    % compute tempertature t
+    T1 = N * deOld(1,:)';
+    % compute tempertature t-dt
+    T2 = N * deOld(2,:)';
     % interpolate phases
     phi = [ dot(N,pe(1,:)); dot(N,pe(2,:)); dot(N,pe(3,:)) ];
+    phiOld = [ dot(N,peOld(1,:)); dot(N,peOld(2,:)); dot(N,peOld(3,:)) ];
     % compute properties
     [ rho, k, cp ] = ComputeProperties( T, prop, phi );
     for j=1:3 % loop over local nodes
@@ -41,15 +47,29 @@ for i = 1:length(w)
         ke = ke + B' * k * B * r * w(i) * jac;
         %
         me = me + N' * (rho*cp) * N * r * w(i) * jac;
+        % latent heat
+        Hp1 = 1.56e9 - 1.5e6 * T1;
+        Hp2 = 1.56e9 - 1.5e6 * T2;
+        Hm = 640e6;
+        Q = (3/(4*dt)) * ( (1.5*Hp1 - 0.5*Hp2) * ( phi(2) - phiOld(2) ) + ...
+            Hm * ( phi(3) - phiOld(3) ) );
+        fe = fe - N' * Q * r * w(i) * jac; 
     else
         ke = ke + B' * k * B * w(i) * jac;
         %
         me = me + N' * (rho*cp) * N * w(i) * jac;
+        % latent heat
+        Hp1 = 1.56e9 - 1.5e6 * T1;
+        Hp2 = 1.56e9 - 1.5e6 * T2;
+        Hm = 640e6;
+        Q = (3/(4*dt)) * ( (1.5*Hp1 - 0.5*Hp2) * ( phi(2) - phiOld(2) ) + ...
+            Hm * ( phi(3) - phiOld(3) ) );
+        fe = fe - N' * Q * w(i) * jac; 
     end
 end
 
 % add contribution from temperature gradient
-fe = ke * de;
+fe = fe + ke * de;
 
 if size(convectionLoad,1) > 0
     index = find(convectionLoad(:,1)==el,1); % 1 face

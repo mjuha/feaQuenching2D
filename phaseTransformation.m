@@ -1,5 +1,5 @@
 function phaseTransformation(dt)
-global MAT Phase scheilRule U nn
+global MAT Phase scheilRule U nn PhaseOld
 
 % get properties, only one material
 % tauS
@@ -16,6 +16,9 @@ tempData = MAT{8};
 % Ta = tempData(1); % starting temperature for transformation of austenite
 % Tb = tempData(2); % starting temperature for transformation of perlite
 Ms = tempData(3); % starting temperature for transformation of martensite
+
+% phase
+PhaseOld = Phase;
 
 for i = 1:nn % all nodes in domain
     temp = U(1,i); % temperature node i

@@ -1,9 +1,10 @@
 function initialCondition(IC)
 
-global U nn Phase PhaseOld scheilRule
+global U nn Phase PhaseOld scheilRule Uold
 
 % solution vector
 U = zeros(2,nn);
+Uold = zeros(2,nn);
 
 % Phase content
 Phase = zeros(3,nn);
@@ -23,6 +24,7 @@ end
 
 for i = 1:nn
     U(1,i) = value;
+    Uold(:,i) = value;
 end
 
 

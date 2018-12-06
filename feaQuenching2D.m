@@ -14,7 +14,7 @@ function feaQuenching2D(filename,varargin)
 %clearvars
 
 global nel neq nzmax coordinates U elements nn LM irow icol ID TS isTimeDBC
-global NLOPT Phase
+global NLOPT Phase Uold PhaseOld
 
 % Specify file name
 %filename = '\\Client\C$\Users\marioju\Documents\Work\valvula\example.inp';
@@ -57,10 +57,12 @@ while ( newtonIter <= maxNumIter )
         xe = coordinates(elements(i,2:4),:);
         de = U(1,elements(i,2:4));
         ae = U(2,elements(i,2:4));
+        deOld = Uold(:,elements(i,2:4));
         % get phases on element´s nodes
         pe = Phase(:,elements(i,2:4));
+        peOld = PhaseOld(:,elements(i,2:4));
         matNum = elements(i,1); % element material number
-        [fe,me,~] = weakform(i,xe,de',ae',pe,matNum);
+        [fe,me,~] = weakform(i,xe,de',deOld,ae',pe,peOld,matNum);
         for k=1:3
             i_index = LM(k,i);
             if (i_index > 0)
@@ -132,6 +134,9 @@ while ( t < tf )
         DBC_InTime(t)
     end
 %     oldNormF = computeF();
+% temperature
+    Uold(2,:) = Uold(1,:);
+    Uold(1,:) = U(1,:);
     % predictor value
     dp = U(1,:) + (1-alpha)*dt*U(2,:);
     U(1,:) = dp;
@@ -151,10 +156,12 @@ while ( t < tf )
             xe = coordinates(elements(i,2:4),:);
             de = U(1,elements(i,2:4));
             ae = U(2,elements(i,2:4));
+            deOld = Uold(:,elements(i,2:4));
             % get phases on element´s nodes
             pe = Phase(:,elements(i,2:4));
+            peOld = PhaseOld(:,elements(i,2:4));
             matNum = elements(i,1); % element material number
-            [fe,me,ke] = weakform(i,xe,de',ae',pe,matNum);
+            [fe,me,ke] = weakform(i,xe,de',deOld,ae',pe,peOld,matNum);
             for k=1:3
                 i_index = LM(k,i);
                 if (i_index > 0)
