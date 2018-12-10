@@ -51,7 +51,7 @@ end
 Ts = Nshape * de;
 
 if isNBCTempDependent
-    h = interp1(HTableData(:,1), HTableData(:,2), Ts, 'linear', 0.0);
+    h = interp1(HTableData(:,1), HTableData(:,2), Ts, 'linear');
 end
 
 if ~isFluxLoad
