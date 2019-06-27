@@ -3,16 +3,10 @@ function [fe,me,ke] = weakform(el,xe,de,deOld,ae,pe,peOld,~)
 global convectionLoad MAT fluxLoad STATE TS
 
 dt = TS{1};
-% alpha = TS{3};
 
 % 1 point formula - degree of precision 1
 gp =  [ 1/3, 1/3];
 w = 0.5;
-% gp = [0.5854101966249685  0.1381966011250105  0.1381966011250105; ...
-%     0.1381966011250105  0.1381966011250105  0.1381966011250105; ...
-%     0.1381966011250105  0.1381966011250105  0.5854101966249685; ...
-%     0.1381966011250105  0.5854101966249685  0.1381966011250105];
-% w = (1/6)*[0.25 0.25 0.25 0.25];
 
 % get material properties
 %prop = cell2mat(MAT(matNum));
@@ -51,8 +45,10 @@ for i = 1:length(w)
         Hp1 = 1.56e9 - 1.5e6 * T1;
         Hp2 = 1.56e9 - 1.5e6 * T2;
         Hm = 640e6;
-        Q = (3/(4*dt)) * ( (1.5*Hp1 - 0.5*Hp2) * ( phi(2) - phiOld(2) ) + ...
-            Hm * ( phi(3) - phiOld(3) ) );
+        %
+        Q = ( (1.5*Hp1 - 0.5*Hp2) * ( phi(2) - phiOld(2) ) + ...
+            Hm * ( phi(3) - phiOld(3) ) ) / dt;
+        
         fe = fe - N' * Q * r * w(i) * jac; 
     else
         ke = ke + B' * k * B * w(i) * jac;
@@ -61,9 +57,12 @@ for i = 1:length(w)
         % latent heat
         Hp1 = 1.56e9 - 1.5e6 * T1;
         Hp2 = 1.56e9 - 1.5e6 * T2;
+%         Hp1 = 953e6 + 0.409e6*T1 - 0.0012e6*T1^2;
+%         Hp2 = 953e6 + 0.409e6*T2 - 0.0012e6*T2^2;
+        %
         Hm = 640e6;
-        Q = (3/(4*dt)) * ( (1.5*Hp1 - 0.5*Hp2) * ( phi(2) - phiOld(2) ) + ...
-            Hm * ( phi(3) - phiOld(3) ) );
+        Q = ( (1.5*Hp1 - 0.5*Hp2) * ( phi(2) - phiOld(2) ) + ...
+            Hm * ( phi(3) - phiOld(3) ) ) / dt;
         fe = fe - N' * Q * w(i) * jac; 
     end
 end
@@ -76,9 +75,9 @@ if size(convectionLoad,1) > 0
     flag = size(index,1);
     % compute side load
     if flag > 0
-        [ke1,fe1] = computeSideLoad(index,xe,de,false);
+        [~,fe1] = computeSideLoad(index,xe,deOld(1,:)',false);
         fe = fe + fe1;
-        ke = ke + ke1;
+        %ke = ke + ke1;
     end
 end
 
