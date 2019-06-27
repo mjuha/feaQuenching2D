@@ -51,6 +51,10 @@ for i = 1:nn % all nodes in domain
                 if Fm < vF(3) % it is an irreversible process
                     Fm = vF(3);
                 end
+                if (Fm < 0) || (old < 0)
+                    Fm = 0;
+                    old = 0;
+                end
                 % autenite
                 tmp = old - Fm;
                 if tmp >= 0
