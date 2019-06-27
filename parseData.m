@@ -136,6 +136,7 @@ for i=1:m
         end
     end
 end
+
 % find face where convection is applied
 if m > 0
     fprintf('\nFinding faces where convection is applied...\n');
@@ -148,11 +149,11 @@ for i=1:m
     tmp = find(C);
     % find edge
     if (tmp(1)== 1 && tmp(2) == 2) || (tmp(1)== 2 && tmp(2) == 1)
-        sideLoad(i,2) = 1; % edge 1
+        convectionLoad(i,2) = 1; % edge 1
     elseif (tmp(1)== 2 && tmp(2) == 3) || (tmp(1)== 3 && tmp(2) == 2)
-        sideLoad(i,2) = 2; % edge 2
+        convectionLoad(i,2) = 2; % edge 2
     elseif (tmp(1)== 3 && tmp(2) == 1) || (tmp(1)== 1 && tmp(2) == 3)
-        sideLoad(i,2) = 3; % edge 3
+        convectionLoad(i,2) = 3; % edge 3
     else
         error('Edge not found!\n')
     end
@@ -238,4 +239,3 @@ end
 ComputeSparsity
 
 end
-

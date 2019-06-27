@@ -75,6 +75,7 @@ else
         sideSet(i,:) = {phyN, tmp{2}};
     end
 end
+
 % get node set association
 tline = fgetl(fileID);
 tmp = strsplit(tline);
@@ -299,33 +300,33 @@ for i=1:nmat
     tmp = strsplit(tline);
     if strcmp(tmp(2),'S1080')
         % read rho austenite
-        s = strcat(pwd,'\data\S1080\densityAustenite.csv');
+        s = strcat(pwd,'/data/S1080/densityAustenite.csv');
         rhoDataAust =  csvread(s);
         % read rho perlite
-        s = strcat(pwd,'\data\S1080\densityPerlite.csv');
+        s = strcat(pwd,'/data/S1080/densityPerlite.csv');
         rhoDataPer =  csvread(s);
         % read cp austenite
-        s = strcat(pwd,'\data\S1080\specificHeatAustenite.csv');
+        s = strcat(pwd,'/data/S1080/specificHeatAustenite.csv');
         cpDataAust =  csvread(s);
         % read cp perlite
-        s = strcat(pwd,'\data\S1080\specificHeatPerlite.csv');
+        s = strcat(pwd,'/data/S1080/specificHeatPerlite.csv');
         cpDataPer =  csvread(s);
         % read thermal conductivity austenite
-        s = strcat(pwd,'\data\S1080\thermalConductivityAustenite.csv');
+        s = strcat(pwd,'/data/S1080/thermalConductivityAustenite.csv');
         kappaDataAust =  csvread(s);
         % read thermal conductivity perlite
-        s = strcat(pwd,'\data\S1080\thermalConductivityPerlite.csv');
+        s = strcat(pwd,'/data/S1080/thermalConductivityPerlite.csv');
         kappaDataPer =  csvread(s);
         % read thermal conductivity martensite
-        s = strcat(pwd,'\data\S1080\thermalConductivityAustenite.csv');
+        s = strcat(pwd,'/data/S1080/thermalConductivityAustenite.csv');
         kappaDataMar =  csvread(s);
         % read temperature transformation data
-        s = strcat(pwd,'\data\S1080\tempData.csv');
+        s = strcat(pwd,'/data/S1080/tempData.csv');
         tempData =  csvread(s);
         % read IT data
-        s = strcat(pwd,'\data\S1080\tauS.csv');
+        s = strcat(pwd,'/data/S1080/tauS.csv');
         tauSData = csvread(s);
-        s = strcat(pwd,'\data\S1080\tauF.csv');
+        s = strcat(pwd,'/data/S1080/tauF.csv');
         tauFData = csvread(s);
     else
         error('Only data for AISI 1080 is available!')
