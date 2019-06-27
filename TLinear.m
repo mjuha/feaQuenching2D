@@ -1,5 +1,5 @@
-function T = TLinear(t,To,Tf,tf)
+function T = TLinear(t,To,m)
 
-T = To + (Tf - To)*t/tf;
+T = To + m*t;
 
 end

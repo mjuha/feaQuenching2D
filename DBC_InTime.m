@@ -1,6 +1,6 @@
 function DBC_InTime(t)
 
-global nodeSet lineNode DBCSet U TS
+global nodeSet lineNode DBCSet U
 
 [m,~] = size(lineNode);
 numericCell = nodeSet(:,1);
@@ -22,7 +22,7 @@ for i=1:m
         if strcmp(dof,'TFunction')
             value = DBCSet{row(j),3};
             if value(1) == 1 % linear function
-                val = TLinear(t,value(2),value(3),TS{2});
+                val = TLinear(t,value(2),value(3)); % time, To and m
             elseif value(1) == 2 % data table
                 val = TTable(t);
             end
