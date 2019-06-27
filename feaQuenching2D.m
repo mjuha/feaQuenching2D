@@ -58,7 +58,7 @@ while ( newtonIter <= maxNumIter )
         de = U(1,elements(i,2:4));
         ae = U(2,elements(i,2:4));
         deOld = Uold(:,elements(i,2:4));
-        % get phases on element´s nodes
+        % get phases on elements nodes
         pe = Phase(:,elements(i,2:4));
         peOld = PhaseOld(:,elements(i,2:4));
         matNum = elements(i,1); % element material number
@@ -106,7 +106,7 @@ end
 fprintf('\n')
 fprintf('Computing phases\n\n')
 phaseTransformation(dt)
-WriteVTKFile(outfile,0)
+WriteVTKFile(outfile,0,0.0)
 
 % fprintf('************************\n')
 % fprintf('Assembling stiffness matrix and force vector\n')
@@ -157,7 +157,7 @@ while ( t < tf )
             de = U(1,elements(i,2:4));
             ae = U(2,elements(i,2:4));
             deOld = Uold(:,elements(i,2:4));
-            % get phases on element´s nodes
+            % get phases on elements nodes
             pe = Phase(:,elements(i,2:4));
             peOld = PhaseOld(:,elements(i,2:4));
             matNum = elements(i,1); % element material number
@@ -205,7 +205,7 @@ while ( t < tf )
     phaseTransformation(dt)
     if mod(counter,nts) == 0
         count1 = count1 + 1;
-        WriteVTKFile(outfile,count1)
+        WriteVTKFile(outfile,count1,t)
     end
     if newtonIter > maxNumIter
         error('Does not converge after max number of iterations!')
@@ -218,4 +218,5 @@ end
 % % computeStressStrain
 % % 
 % % WriteVTKFile(outfile,1)
+
 end
