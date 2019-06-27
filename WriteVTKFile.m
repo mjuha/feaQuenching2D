@@ -1,4 +1,4 @@
-function WriteVTKFile( outfiledest,istep  )
+function WriteVTKFile( outfiledest,istep,t  )
 % ======================================================================
 % This file is part of feaHeat3D.
 
@@ -48,6 +48,9 @@ fprintf(fid, '# vtk DataFile Version 3.8\n');
 fprintf(fid, 'Mesh\n');
 fprintf(fid,'ASCII\n');
 fprintf(fid, 'DATASET UNSTRUCTURED_GRID\n');
+fprintf(fid, 'FIELD fieldData 1\n');
+fprintf(fid, 'TIME 1 1 double\n');
+fprintf(fid, '%g\n', t);
 fprintf(fid, '%s %d %s\n','POINTS ', nn, 'float');
 for i=1:nn
     fprintf(fid, '%g  %g  %g\n', coordinates(i,1), coordinates(i,2), coordinates(i,3));
