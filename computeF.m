@@ -7,7 +7,7 @@ for i=1:nel
     de = U(1,elements(i,2:4));
     ae = U(2,elements(i,2:4));
     deOld = Uold(:,elements(i,2:4));
-    % get phases on element´s nodes
+    % get phases on elements nodes
     pe = Phase(:,elements(i,2:4));
     peOld = PhaseOld(:,elements(i,2:4));
     matNum = elements(i,1); % element material number

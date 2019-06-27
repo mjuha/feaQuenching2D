@@ -1,6 +1,6 @@
 function [ke,fe] = computeSideLoad(el,xe,de,isFluxLoad)
 
-global convectionLoad fluxLoad HTableData isNBCTempDependent
+global convectionLoad fluxLoad HTableData isNBCTempDependent STATE
 
 % Gauss - Legendre rule. 1 point in [0,1]
 gp = 0.5;
@@ -17,9 +17,8 @@ else
     edge = fluxLoad(el,2);
     q = fluxLoad(el,5); % heat flux
 end
-
-fe = zeros(4,1);
-ke = zeros(4,4);
+fe = zeros(3,1);
+ke = zeros(3,3);
 if edge == 1 % local nodes 1-2
     r = gp;
     % s = 0
@@ -51,13 +50,16 @@ end
 Ts = Nshape * de;
 
 if isNBCTempDependent
-    h = interp1(HTableData(:,1), HTableData(:,2), Ts, 'linear');
+    h = interp1(HTableData(:,1), HTableData(:,2), Ts, 'linear','extrap');
+end
+if h < 0.0
+    error('Film coefficient is negative!')
 end
 
 if ~isFluxLoad
     if STATE(1) == 1 % axisymmetric
         % interpolate radial coordinate
-        r = N * xe(:,1);
+        r = Nshape * xe(:,1);
         fe = fe - Nshape' * ( h * ( Ta - Ts ) ) * r * w * jac;
         ke = ke + Nshape' * h * Nshape * r * w * jac;
     else
