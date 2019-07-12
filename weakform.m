@@ -42,9 +42,11 @@ for i = 1:length(w)
         %
         me = me + N' * (rho*cp) * N * r * w(i) * jac;
         % latent heat
-        Hp1 = 1.56e9 - 1.5e6 * T1;
-        Hp2 = 1.56e9 - 1.5e6 * T2;
-        Hm = 640e6;
+        [H1] = LatentHeat(T1);
+        [H2] = LatentHeat(T2);
+        Hp1 = H1(1);
+        Hp2 = H2(1);
+        Hm = H1(2);
         %
         Q = ( (1.5*Hp1 - 0.5*Hp2) * ( phi(2) - phiOld(2) ) + ...
             Hm * ( phi(3) - phiOld(3) ) ) / dt;
@@ -55,12 +57,12 @@ for i = 1:length(w)
         %
         me = me + N' * (rho*cp) * N * w(i) * jac;
         % latent heat
-        Hp1 = 1.56e9 - 1.5e6 * T1;
-        Hp2 = 1.56e9 - 1.5e6 * T2;
-%         Hp1 = 953e6 + 0.409e6*T1 - 0.0012e6*T1^2;
-%         Hp2 = 953e6 + 0.409e6*T2 - 0.0012e6*T2^2;
+        [H1] = LatentHeat(T1);
+        [H2] = LatentHeat(T2);
+        Hp1 = H1(1);
+        Hp2 = H2(1);
+        Hm = H1(2);
         %
-        Hm = 640e6;
         Q = ( (1.5*Hp1 - 0.5*Hp2) * ( phi(2) - phiOld(2) ) + ...
             Hm * ( phi(3) - phiOld(3) ) ) / dt;
         fe = fe - N' * Q * w(i) * jac; 
