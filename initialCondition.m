@@ -8,10 +8,10 @@ Uold = zeros(2,nn);
 
 % Phase content
 Phase = zeros(3,nn);
-Phase(1,:) = 0.99; % austenite
+Phase(1,:) = 1.0; % austenite
 %
 PhaseOld = zeros(3,nn);
-PhaseOld(1,:) = 0.99; % austenite
+PhaseOld(1,:) = 1.0; % austenite
 %
 % Scheil's rule
 scheilRule = zeros(1,nn);

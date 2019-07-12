@@ -43,10 +43,10 @@ for i = 1:nn % all nodes in domain
             %
             % compute volume phase (perlite)
             vF(2) = ( 1 - exp( -a * tj^n ) );
-            vF(1) = 0.99 - vF(2); % (austenite)
+            vF(1) = 1 - vF(2); % (austenite)
         else % martensite
             if temp <= Ms
-                old = (0.99 - vF(2));
+                old = (1 - vF(2));
                 Fm = ( 1 - exp( -0.011 * (Ms - temp) ) ) * old;
                 if Fm < vF(3) % it is an irreversible process
                     Fm = vF(3);
