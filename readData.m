@@ -2,7 +2,7 @@ function outfile = readData(filename)
 
 % global variables
 global DBCSet HFCSet NBCSet TS MAT isTimeDBC nodeSet NLOPT TTableData
-global HTableData isNBCTempDependent STATE
+global HTableData isNBCTempDependent STATE RBCSet
 
 % global rhoDataAust rhoDataPer rhoDataMar 
 % global cpDataAust cpDataPer tauData kappaDataAust kappaDataPer kappaDataMar
@@ -189,6 +189,27 @@ else
         end
         value = str2double(tmp(7)); % value to assign
         HFCSet(i,:) = {name, value};
+    end
+end
+
+% read Neumann (radiation) BCs
+tline = fgetl(fileID);
+tmp = strsplit(tline);
+nrbc = str2double(tmp(3)); % number of radiation bcs to read
+RBCSet = cell(nrbc,2);
+if nrbc == 0
+    fgetl(fileID); %dummy line
+else
+    for i=1:nrbc
+        tline = fgetl(fileID);
+        tmp = strsplit(tline);
+        name = tmp{4};
+        dof = sscanf(tmp{6},'%[radiation]');
+        if ~strcmp(dof,'radiation')
+            error('RBC must be radiation, please check')
+        end
+        value = str2double(tmp(7)); % value to assign
+        RBCSet(i,:) = {name, value};
     end
 end
 

@@ -2,8 +2,8 @@ function parseData(nodeSet, sideSet)
 
 % global variables
 global elements nn nel  ID LM fluxLoad convectionLoad
-global U neq lineNode sideLoad
-global DBCSet HFCSet NBCSet
+global U neq lineNode sideLoad radiationLoad
+global DBCSet HFCSet NBCSet RBCSet
 
 % post-process boundary conditions
 % ===============
@@ -120,6 +120,36 @@ else
     convectionLoad = [];
 end
 % 
+% for radiation BCs
+[row,~] = size(RBCSet);
+if row > 0
+    radiationLoad = zeros(m-count,5);
+    numericCell = sideSet(:,1);
+    numericVector = cell2mat(numericCell);
+    count = 1;
+    % check sideSet
+    for i=1:m
+        phytag = lineNode(i,1);
+        % search in sideSet
+        [row,~] = find(numericVector==phytag);
+        if  isempty(row)
+            continue
+        end
+        % find in RBCSet first
+        name = sideSet{row,2};
+        % find in RBCSet first
+        [row,~] = find(strcmp(RBCSet,name),3);
+        for j=1:length(row)
+            value = RBCSet{row(j),2};
+            radiationLoad(count,3:4) = lineNode(i,2:3);
+            radiationLoad(count,5) = value;
+            count = count + 1;
+        end
+    end
+else
+    radiationLoad = [];
+end
+% 
 % find element where convection is applied
 [m,~] = size(convectionLoad);
 if m > 0
@@ -136,7 +166,15 @@ for i=1:m
         end
     end
 end
-
+%
+[row,~] = size(NBCSet);
+if row > 0
+    index = find(~convectionLoad(:,1),1);
+    if ~isempty(index)
+        convectionLoad(index:end,:) = [];
+    end
+end
+[m,~] = size(convectionLoad);
 % find face where convection is applied
 if m > 0
     fprintf('\nFinding faces where convection is applied...\n');
@@ -156,14 +194,6 @@ for i=1:m
         convectionLoad(i,2) = 3; % edge 3
     else
         error('Edge not found!\n')
-    end
-end
-%
-[row,~] = size(NBCSet);
-if row > 0
-    index = find(~convectionLoad(:,1),1);
-    if ~isempty(index)
-        convectionLoad(index:end,:) = [];
     end
 end
 
@@ -211,6 +241,53 @@ if row > 0
     index = find(~fluxLoad(:,1),1);
     if ~isempty(index)
         fluxLoad(index:end,:) = [];
+    end
+end
+%
+% find element where radiation is applied
+[m,~] = size(radiationLoad);
+if m > 0
+    fprintf('\nFinding elements where radiation is applied...\n');
+end
+for i=1:m
+    A = radiationLoad(i,3:4);
+    for j=1:nel
+        B = elements(j,2:4);
+        C = ismember(B,A);
+        if sum(C) == 2
+            radiationLoad(i,1) = j;
+            break
+        end
+    end
+end
+% find face where radiation is applied
+if m > 0
+    fprintf('\nFinding faces where radiation is applied...\n');
+end
+for i=1:m
+    A = radiationLoad(i,3:4);
+    j = radiationLoad(i,1);
+    B = elements(j,2:4);
+    C = ismember(B,A);
+    tmp = find(C);
+    % find face
+    if (tmp(1)== 1 && tmp(2) == 2) || (tmp(1)== 2 && tmp(2) == 1)
+        radiationLoad(i,2) = 1; % face 1
+    elseif (tmp(1)== 2 && tmp(2) == 3) || (tmp(1)== 3 && tmp(2) == 2)
+        radiationLoad(i,2) = 2; % face 2
+    elseif (tmp(1)== 3 && tmp(2) == 1) || (tmp(1)== 1 && tmp(2) == 3)
+        radiationLoad(i,2) = 3; % face 3
+    else
+        error('Edge not found!\n')
+    end
+end
+% 
+%
+[row,~] = size(RBCSet);
+if row > 0
+    index = find(~radiationLoad(:,1),1);
+    if ~isempty(index)
+        radiationLoad(index:end,:) = [];
     end
 end
 % 

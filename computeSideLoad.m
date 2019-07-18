@@ -1,24 +1,31 @@
-function [ke,fe] = computeSideLoad(el,xe,de,isFluxLoad)
+function [fe] = computeSideLoad(el,xe,de,BCLoadFlag)
 
 global convectionLoad fluxLoad HTableData isNBCTempDependent STATE
+global radiationLoad
 
 % Gauss - Legendre rule. 1 point in [0,1]
 gp = 0.5;
 w = 1.0;
 
-% compute residual: side loads
-if ~isFluxLoad
-    edge = convectionLoad(el,2);
-    if ~isNBCTempDependent
-        h = convectionLoad(el,5); % coefficient
-    end
-    Ta = convectionLoad(el,6); % ambient temperature
-else
-    edge = fluxLoad(el,2);
-    q = fluxLoad(el,5); % heat flux
+switch BCLoadFlag
+    case 'flux'
+        edge = fluxLoad(el,2);
+        q = fluxLoad(el,5); % heat flux
+    case 'convection'
+        edge = convectionLoad(el,2);
+        if ~isNBCTempDependent
+            h = convectionLoad(el,5); % coefficient
+        end
+        Ta = convectionLoad(el,6); % ambient temperature
+    case 'radiation'
+        edge = radiationLoad(el,2);
+        Ta = radiationLoad(el,5); % ambient temperature
+    otherwise
+        error('BCLoad flag unknown')
 end
+
 fe = zeros(3,1);
-ke = zeros(3,3);
+% ke = zeros(3,3);
 if edge == 1 % local nodes 1-2
     r = gp;
     % s = 0
@@ -56,25 +63,38 @@ if h < 0.0
     error('Film coefficient is negative!')
 end
 
-if ~isFluxLoad
-    if STATE(1) == 1 % axisymmetric
-        % interpolate radial coordinate
-        r = Nshape * xe(:,1);
-        fe = fe - Nshape' * ( h * ( Ta - Ts ) ) * r * w * jac;
-        ke = ke + Nshape' * h * Nshape * r * w * jac;
-    else
-        fe = fe - Nshape' * ( h * ( Ta - Ts ) ) * w * jac;
-        ke = ke + Nshape' * h * Nshape * w * jac;
-    end
-else
-    if STATE(1) == 1 % axisymmetric
-        % interpolate radial coordinate
-        r = N * xe(:,1);
-        fe = fe - Nshape' * q * r * w * jac;
-    else
-        fe = fe - Nshape' * q * w * jac;
-    end
-    %ke = zeros(4,4);
+switch BCLoadFlag
+    case 'convection'
+        if STATE(1) == 1 % axisymmetric
+            % interpolate radial coordinate
+            r = Nshape * xe(:,1);
+            fe = fe - Nshape' * ( h * ( Ta - Ts ) ) * r * w * jac;
+            %         ke = ke + Nshape' * h * Nshape * r * w * jac;
+        else
+            fe = fe - Nshape' * ( h * ( Ta - Ts ) ) * w * jac;
+            %         ke = ke + Nshape' * h * Nshape * w * jac;
+        end
+    case 'flux'
+        if STATE(1) == 1 % axisymmetric
+            % interpolate radial coordinate
+            r = N * xe(:,1);
+            fe = fe - Nshape' * q * r * w * jac;
+        else
+            fe = fe - Nshape' * q * w * jac;
+        end
+    case 'radiation'
+        sigma = 5.670373e-8; % W/(m²*K⁴)
+        if STATE(1) == 1 % axisymmetric
+            % interpolate radial coordinate
+            r = Nshape * xe(:,1);
+            fe = fe - Nshape' * ( sigma * ( (Ta + 273.15)^4 - (Ts + 273.15)^4 ) ) * r * w * jac;
+            %         ke = ke + Nshape' * h * Nshape * r * w * jac;
+        else
+            fe = fe - Nshape' * ( sigma * ( (Ta + 273.15)^4 - (Ts + 273.15)^4 ) ) * w * jac;
+            %         ke = ke + Nshape' * h * Nshape * w * jac;
+        end
+    otherwise
+        error('BCLoad flag unknown')
 end
 
 end

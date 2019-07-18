@@ -1,6 +1,6 @@
 function [fe,me,ke] = weakform(el,xe,de,deOld,ae,pe,peOld,~)
 
-global convectionLoad MAT fluxLoad STATE TS
+global convectionLoad MAT fluxLoad STATE TS radiationLoad
 
 dt = TS{1};
 
@@ -77,7 +77,7 @@ if size(convectionLoad,1) > 0
     flag = size(index,1);
     % compute side load
     if flag > 0
-        [~,fe1] = computeSideLoad(index,xe,deOld(1,:)',false);
+        [fe1] = computeSideLoad(index,xe,deOld(1,:)','convection');
         fe = fe + fe1;
         %ke = ke + ke1;
     end
@@ -89,8 +89,19 @@ if size(fluxLoad,1) > 0
     flag = size(index,1);
     % compute side load
     if flag > 0
-        [~,fe1] = computeSideLoad(index,xe,de,true);
+        [fe1] = computeSideLoad(index,xe,de,'flux');
         fe = fe + fe1;
+    end
+end
+
+% now radiation load
+if size(radiationLoad,1) > 0
+    index = find(radiationLoad(:,1)==el,1); % 1 face
+    flag = size(index,1);
+    % compute side load
+    if flag > 0
+        [fe2] = computeSideLoad(index,xe,de,'radiation');
+        fe = fe + fe2;
     end
 end
 
