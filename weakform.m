@@ -100,8 +100,8 @@ if size(radiationLoad,1) > 0
     flag = size(index,1);
     % compute side load
     if flag > 0
-        [fe2] = computeSideLoad(index,xe,de,'radiation');
-        fe = fe + fe2;
+        [fe1] = computeSideLoad(index,xe,deOld(1,:)','radiation');
+        fe = fe + fe1;
     end
 end
 
