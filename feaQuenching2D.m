@@ -15,6 +15,7 @@ function feaQuenching2D(filename,varargin)
 
 global nel neq nzmax coordinates U elements nn LM irow icol ID TS isTimeDBC
 global NLOPT Phase Uold PhaseOld
+global convectionLoad fluxLoad radiationLoad
 
 % Specify file name
 %filename = '\\Client\C$\Users\marioju\Documents\Work\valvula\example.inp';
@@ -77,10 +78,58 @@ while ( newtonIter <= maxNumIter )
             end
         end
     end
+    % add convection load
+    conv_elem = size(convectionLoad,1);
+    if conv_elem > 0
+        for i=1:conv_elem
+            el = convectionLoad(i,1);
+            xe = coordinates(elements(el,2:4),:);
+            deOld = Uold(:,elements(el,2:4));
+            [fe] = computeSideLoad(i,xe,deOld(1,:)','convection');
+            for k=1:3
+                i_index = LM(k,el);
+                if (i_index > 0)
+                    F(i_index) = F(i_index) - fe(k);
+                end
+            end
+        end
+    end
+    % now flux load
+    flux_elem = size(fluxLoad,1);
+    if flux_elem > 0
+        for i=1:flux_elem
+            el = fluxLoad(i,1);
+            xe = coordinates(elements(el,2:4),:);
+            deOld = Uold(:,elements(el,2:4));
+            [fe] = computeSideLoad(i,xe,deOld(1,:)','flux');
+            for k=1:3
+                i_index = LM(k,el);
+                if (i_index > 0)
+                    F(i_index) = F(i_index) - fe(k);
+                end
+            end
+        end
+    end
+    % add radiation load
+    rad_elem = size(radiationLoad,1);
+    if rad_elem > 0
+        for i=1:rad_elem
+            el = radiationLoad(i,1);
+            xe = coordinates(elements(el,2:4),:);
+            deOld = Uold(:,elements(el,2:4));
+            [fe] = computeSideLoad(i,xe,deOld(1,:)','radiation');
+            for k=1:3
+                i_index = LM(k,el);
+                if (i_index > 0)
+                    F(i_index) = F(i_index) - fe(k);
+                end
+            end
+        end
+    end
     fprintf('\n')
     fprintf('Solving system of equations\n')
     fprintf('\n')
-    M = sparse(irow,icol,K,neq,neq);
+    M = sparse(irow,icol,K);
     F = M\F;
     % assign solution
     for r=1:nn
@@ -118,6 +167,7 @@ fprintf('************************\n\n')
 t = 0;
 tf = TS{2}; % final time
 alpha = TS{3}; % method
+fprintf('alpha = %d\n',alpha)
 nts = TS{4}; % ouput every nts
 counter = 0;
 count1 = 0;
@@ -176,10 +226,58 @@ while ( t < tf )
                 end
             end
         end
+        % add convection load
+        conv_elem = size(convectionLoad,1);
+        if conv_elem > 0
+            for i=1:conv_elem
+                el = convectionLoad(i,1);
+                xe = coordinates(elements(el,2:4),:);
+                deOld = Uold(:,elements(el,2:4));
+                [fe] = computeSideLoad(i,xe,deOld(1,:)','convection');
+                for k=1:3
+                    i_index = LM(k,el);
+                    if (i_index > 0)
+                        F(i_index) = F(i_index) - fe(k);
+                    end
+                end
+            end
+        end
+        % now flux load
+        flux_elem = size(fluxLoad,1);
+        if flux_elem > 0
+            for i=1:flux_elem
+                el = fluxLoad(i,1);
+                xe = coordinates(elements(el,2:4),:);
+                deOld = Uold(:,elements(el,2:4));
+                [fe] = computeSideLoad(i,xe,deOld(1,:)','flux');
+                for k=1:3
+                    i_index = LM(k,el);
+                    if (i_index > 0)
+                        F(i_index) = F(i_index) - fe(k);
+                    end
+                end
+            end
+        end
+        % add radiation load
+        rad_elem = size(radiationLoad,1);
+        if rad_elem > 0
+            for i=1:rad_elem
+                el = radiationLoad(i,1);
+                xe = coordinates(elements(el,2:4),:);
+                deOld = Uold(:,elements(el,2:4));
+                [fe] = computeSideLoad(i,xe,deOld(1,:)','radiation');
+                for k=1:3
+                    i_index = LM(k,el);
+                    if (i_index > 0)
+                        F(i_index) = F(i_index) - fe(k);
+                    end
+                end
+            end
+        end
         fprintf('\n')
         fprintf('Solving system of equations\n')
         fprintf('\n')
-        M = sparse(irow,icol,K,neq,neq);
+        M = sparse(irow,icol,K);
         F = M\F;
         % assign solution
         for r=1:nn

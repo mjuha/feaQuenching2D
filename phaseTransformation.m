@@ -47,7 +47,7 @@ for i = 1:nn % all nodes in domain
         else % martensite
             if temp <= Ms
                 old = (1 - vF(2));
-                Fm = ( 1 - exp( -0.011 * (Ms - temp) ) ) * old;
+                Fm = ( 1 - exp( -0.0134 * (Ms - temp) ) ) * old;
                 if Fm < vF(3) % it is an irreversible process
                     Fm = vF(3);
                 end

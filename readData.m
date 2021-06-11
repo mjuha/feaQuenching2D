@@ -339,7 +339,7 @@ for i=1:nmat
         s = strcat(pwd,'/data/S1080/thermalConductivityPerlite.csv');
         kappaDataPer =  csvread(s);
         % read thermal conductivity martensite
-        s = strcat(pwd,'/data/S1080/thermalConductivityAustenite.csv');
+        s = strcat(pwd,'/data/S1080/thermalConductivityMartensite.csv');
         kappaDataMar =  csvread(s);
         % read temperature transformation data
         s = strcat(pwd,'/data/S1080/tempData.csv');

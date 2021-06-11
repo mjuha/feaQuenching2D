@@ -1,6 +1,7 @@
-function [fe,me,ke] = weakform(el,xe,de,deOld,ae,pe,peOld,~)
+function [fe,me,ke] = weakform(~,xe,de,deOld,ae,pe,peOld,~)
 
-global convectionLoad MAT fluxLoad STATE TS radiationLoad
+%global convectionLoad MAT fluxLoad STATE TS radiationLoad
+global MAT STATE TS
 
 dt = TS{1};
 
@@ -72,38 +73,38 @@ end
 % add contribution from temperature gradient
 fe = fe + ke * de;
 
-if size(convectionLoad,1) > 0
-    index = find(convectionLoad(:,1)==el,1); % 1 face
-    flag = size(index,1);
-    % compute side load
-    if flag > 0
-        [fe1] = computeSideLoad(index,xe,deOld(1,:)','convection');
-        fe = fe + fe1;
-        %ke = ke + ke1;
-    end
-end
+% if size(convectionLoad,1) > 0
+%     index = find(convectionLoad(:,1)==el,1); % 1 face
+%     flag = size(index,1);
+%     % compute side load
+%     if flag > 0
+%         [fe1] = computeSideLoad(index,xe,deOld(1,:)','convection');
+%         fe = fe + fe1;
+%         %ke = ke + ke1;
+%     end
+% end
 
-% now flux load
-if size(fluxLoad,1) > 0
-    index = find(fluxLoad(:,1)==el,1); % 1 face
-    flag = size(index,1);
-    % compute side load
-    if flag > 0
-        [fe1] = computeSideLoad(index,xe,de,'flux');
-        fe = fe + fe1;
-    end
-end
+% % now flux load
+% if size(fluxLoad,1) > 0
+%     index = find(fluxLoad(:,1)==el,1); % 1 face
+%     flag = size(index,1);
+%     % compute side load
+%     if flag > 0
+%         [fe1] = computeSideLoad(index,xe,de,'flux');
+%         fe = fe + fe1;
+%     end
+% end
 
 % now radiation load
-if size(radiationLoad,1) > 0
-    index = find(radiationLoad(:,1)==el,1); % 1 face
-    flag = size(index,1);
-    % compute side load
-    if flag > 0
-        [fe1] = computeSideLoad(index,xe,deOld(1,:)','radiation');
-        fe = fe + fe1;
-    end
-end
+% if size(radiationLoad,1) > 0
+%     index = find(radiationLoad(:,1)==el,1); % 1 face
+%     flag = size(index,1);
+%     % compute side load
+%     if flag > 0
+%         [fe1] = computeSideLoad(index,xe,deOld(1,:)','radiation');
+%         fe = fe + fe1;
+%     end
+% end
 
 %fe = fe - ke * de;
 fe = fe + me*ae;

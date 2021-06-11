@@ -83,7 +83,7 @@ switch BCLoadFlag
             fe = fe - Nshape' * q * w * jac;
         end
     case 'radiation'
-        sigma = 5.670373e-8; % W/(m¬≤*K‚Å¥)
+        sigma = 5.670373e-8; % W/(m¬≤*K‚?¥)
         if STATE(1) == 1 % axisymmetric
             % interpolate radial coordinate
             r = Nshape * xe(:,1);
